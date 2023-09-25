@@ -45,4 +45,3 @@
       user:
         name: "rodriguez"
         state: present
-      when: new_user_name is defined
