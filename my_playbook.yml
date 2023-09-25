@@ -1,0 +1,48 @@
+
+---
+- name: Configure Managed Nodes
+  hosts: dbservers
+  become: false
+
+  vars_files:
+    - config.yaml
+  
+  tasks:
+    - name: Ensure python 3 is installed and pip3 as default pip
+      become: yes
+      apt:
+        name: python3
+        state: latest
+      loop:
+        - python3
+        - python3-pip
+      when: ansible_distribution == "Ubuntu"
+
+    - name: use python 3 as default python
+      become: yes
+      command: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+    - name: Install openjdk java
+      become: yes
+      apt:
+        name: openjdk-11-jdk
+        state: present
+ 
+    - name: include the config file
+      include_vars:
+        file: config.yaml
+
+    - name: set default motd
+      set_fact:
+        motd_text: "Ansible managed node by rodriguez"
+
+    - name: set MOTD
+      template:
+        src: motd.j2
+        dest: ~/motd
+ 
+    - name: Create a user
+      user:
+        name: "rodriguez"
+        state: present
+      when: new_user_name is defined

@@ -1,0 +1,2 @@
+motd_var: "Welcome to ansible"
+user_name: rodriguez
